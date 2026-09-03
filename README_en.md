@@ -1,79 +1,90 @@
-# HoYo Glyphs
+<p align="center">
+  <img src="./src/hoyographae/resources/hoyographae-icon.svg" width="184" alt="HoyoGraphae icon">
+</p>
 
-![Image to Font Specimen](specimen.png)
+<h1 align="center">HoyoGraphae</h1>
 
-🌎 English | **[简体中文](README.md)**
+<p align="center"><strong>A local workspace for HoYoverse constructed scripts</strong></p>
 
-## Intro
+<p align="center"><a href="./README.md">简体中文</a> · <strong>English</strong></p>
 
-This repository contains the fonts of the constructed writing systems
-in the video games developed by Hoyoverse. These fonts are
-**not obtained from any forms of reverse engineering to the games**.
+> [!IMPORTANT]
+> This project is currently a desktop prototype. The foundations for font browsing and text generation are being implemented; native Martian rendering and constructed-script OCR are not complete. The README distinguishes working features from planned work and does not present generic OCR as a script-specific recognizer.
 
-If you want to track the updates on this repository, please click the eye icon (watch) above.
+## One application, four workflows
 
-## Download
+| Module | Purpose | Current status |
+| --- | --- | --- |
+| Font library | Collect and filter constructed-script fonts from the games | Latest font sources inherited; desktop app can load local OpenType fonts |
+| Glyph browser | Browse a font by character, Unicode value, and glyph | Qt prototype available |
+| Text generator | Type for live preview and export a transparent or solid-background PNG | Qt prototype available |
+| Image text recognition | Locate and transcribe constructed scripts in screenshots | UI and engine boundary reserved; dedicated models still need training |
 
-Please go to Release.
+Martian is not a conventional font: it is a compositional vector writing system. HoyoGraphae preserves the complete upstream implementation and will port it natively to Qt `QPainter` instead of embedding a browser runtime.
 
-### Metadata
+## Local Qt architecture
 
-Thanks to @kuriyota for providing [metadata](https://github.com/kuriyota/HoYo-Glyphs-With-Meta).
-You might find this helpful if you're using the font on a website.
+The first release uses **Python 3.11 + PySide6 6.9+ + Qt Widgets**:
 
-## Update Log & Known Issues
+- Qt provides the desktop UI, in-process font loading, screen rendering, and image export;
+- fontTools reads cmaps, glyph names, and font metadata;
+- `.glyphs` sources are converted with glyphsLib/fontmake only at build time and are never modified at runtime;
+- OCR training stays outside the desktop app; future packages will carry only versioned ONNX inference models;
+- fonts are loaded for the current process and are not installed into the Windows font directory.
 
-Please go to Wiki.
+### Run from source (Windows PowerShell)
 
-## Included Writing Systems
+```powershell
+git clone https://github.com/Etymodes/HoyoGraphae.git
+Set-Location HoyoGraphae
 
-All the writing systems that appeared in the game are listed below.
-A tick means the font of this writing system is ready to use from this repository.
+py -3.11 -m venv .venv
+& .\.venv\Scripts\python.exe -m pip install --upgrade pip
+& .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+& .\.venv\Scripts\python.exe -m hoyographae
+```
 
-### Genshin Impact
+The current development source primarily contains the HoYo fonts as `.glyphs` files. To exercise the desktop prototype, load an already compiled `.ttf` or `.otf` file from the application.
 
-- [X] Teyvat Script (Mondstadt)
-- [X] Inazuma Script
-- [X] Khaenri'ah Script
-- [X] Khaenri'ah Script - The Chasm's Variant
-- [X] Sumeru Script
-- [X] Deshret Script
+## Upstream resources and pinned versions
 
-### Honkai: Star Rail
+HoyoGraphae is a local application built after both @SpeedyOrc-C and @Etymodes contributed to the related resources. The current source snapshots are pinned as follows:
 
-- [X] Star Rail Script (Herta Space Station)
-- [X] Luofu Script
-- [ ] Amphoreus Script
+| Source | Branch and commit | Location in this repository |
+| --- | --- | --- |
+| [HoYo-Glyphs](https://github.com/SpeedyOrc-C/HoYo-Glyphs) | `main@ad0c03ce9792d623c6a6161e5582a01903bd5d97` | Git history and `src/*.glyphs` |
+| [Honkai-3rd-II-Martian](https://github.com/SpeedyOrc-C/Honkai-3rd-II-Martian) | `main@89998b86c83e364d970be639917f422b00d6015b` | `upstream/Honkai-3rd-II-Martian/` |
 
-### Honkai Impact 3<sup>rd</sup>
+Both upstream projects currently expose `main` as their only public development branch. The exact machine-readable record is in [`upstreams.lock.json`](./upstreams.lock.json). The inherited HoYo-Glyphs fonts are manually reconstructed resources and are **not extracted game files**.
 
-- [X] [Martian](https://github.com/SpeedyOrc-C/Honkai-3rd-II-Martian)'s
-writing system is quite complicated, thus we do not make a font for it for now. Now it has been implemented with web technology.
+## Roadmap
 
-### Zenless Zone Zero
+- **M0 · Desktop foundation:** font loading, glyph grid, live typing preview, PNG export, and an explicit OCR placeholder.
+- **M1 · Bundled library:** batch font builds and catalog; variable axes; native Qt Martian rendering with golden-image regression tests.
+- **M2 · Local OCR:** begin with one script and manually selected text lines, freeze an evaluation set and publish accuracy, then add automatic text detection.
 
-- [X] ZZZ Script System
-- [X] ZZZ Script A
-- [ ] ZZZ Script B
+## Support the developers
 
-### Writing Systems that We Won't Add
+<table>
+  <tr>
+    <td align="center">
+      <strong>陈湛明 · WeChat</strong><br><br>
+      <img src="./donation-wechat.jpg" width="280" alt="Chen Zhanming's WeChat donation code">
+    </td>
+    <td align="center">
+      <strong>@Etymodes · Zelle</strong><br><br>
+      <code>Peterpig123456@gmail.com</code>
+    </td>
+  </tr>
+</table>
 
-- Ishine Script (Genshin Impact - Inazuma - Tsurumi)
-- Liyue Script (Genshin Impact - Liyue)
+Donations are voluntary support. They do not purchase or grant a commercial license to the fonts.
 
-## Have Rendering Issues?
+## Licenses and notices
 
-If you have issues with rendering, please report on
-[the Issue page](https://github.com/SpeedyOrc-C/HoYo-Glyphs/issues).
+- HoYo-Glyphs font and alphabet resources follow the repository root's [custom non-commercial license](./LICENSE), including requirements for embedding, modifications, and source links.
+- The original Martian implementation follows the [MIT License](./upstream/Honkai-3rd-II-Martian/LICENSE), Copyright © 2023 陈湛明.
+- A separate license has not yet been selected for original application code; neither upstream license automatically extends to new application code.
+- See [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) for full provenance and third-party notices.
 
-## Using Variants
-
-### Microsoft 365 (Office)
-
-Individual fonts will show up here instead of font variant.
-
-![Using font variant in Microsoft Pages](font-variant-in-ms-office.png)
-
-### Apple Pages
-
-![Using font variant in Apple Pages](font-variant-in-pages.png)
+HoyoGraphae is an unofficial fan project and is not affiliated with, sponsored by, or endorsed by HoYoverse or its affiliates. Game and product names belong to their respective owners.

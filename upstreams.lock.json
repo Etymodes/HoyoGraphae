@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-03",
+  "sources": [
+    {
+      "name": "HoYo-Glyphs",
+      "repository": "https://github.com/SpeedyOrc-C/HoYo-Glyphs",
+      "branch": "main",
+      "commit": "ad0c03ce9792d623c6a6161e5582a01903bd5d97",
+      "integration": "repository history and root font sources",
+      "path": "src/*.glyphs",
+      "license": "LICENSE"
+    },
+    {
+      "name": "Honkai-3rd-II-Martian",
+      "repository": "https://github.com/SpeedyOrc-C/Honkai-3rd-II-Martian",
+      "branch": "main",
+      "commit": "89998b86c83e364d970be639917f422b00d6015b",
+      "integration": "vendored source snapshot",
+      "path": "upstream/Honkai-3rd-II-Martian",
+      "license": "upstream/Honkai-3rd-II-Martian/LICENSE"
+    }
+  ]
+}

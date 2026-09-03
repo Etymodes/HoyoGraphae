@@ -9,7 +9,7 @@
       "commit": "ad0c03ce9792d623c6a6161e5582a01903bd5d97",
       "integration": "repository history and root font sources",
       "path": "src/*.glyphs",
-      "license": "LICENSE"
+      "license": "LICENSES/HoYo-Glyphs-NONCOMMERCIAL.txt"
     },
     {
       "name": "Honkai-3rd-II-Martian",

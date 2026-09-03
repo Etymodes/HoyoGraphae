@@ -1,21 +1,28 @@
-Please feel free to download, display, embed and modify these fonts and the alphabet
-while following these rules:
+HoyoGraphae application code license
 
-1. Not for any forms of commercial use.
-2. Provide a link to [this repository](https://github.com/SpeedyOrc-C/HoYo-Glyphs)
-   for all media (e.g. websites) that embed any fonts from this repository.
-3. Modified fonts should not be made close-sourced.
-4. If the embedded fonts are the modified version, provide a link to where they come from.
-5. All modified fonts should provide a link to their unmodified version, that is, forming a closure of dependency.
+This license applies to original HoyoGraphae application code and project-specific
+documentation, except where a file or directory is identified separately in
+THIRD_PARTY_NOTICES.md or LICENSES/README.md. It does not relicense upstream font,
+writing-system, donation, or branding assets.
 
-September 19, 2024
+MIT License
 
-NO FAN-MADE LICENSE OBTAINED
+Copyright (c) 2026 Songyuan Wu (吴松原, Etymodes)
 
-2022 July 30
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-LICENSE PENDING...
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Now applying for a fan-made authorization according to [this](https://bbs.mihoyo.com/ys/article/12304239).
-
-2022 July 1
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

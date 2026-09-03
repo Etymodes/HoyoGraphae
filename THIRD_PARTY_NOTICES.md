@@ -7,7 +7,7 @@ HoyoGraphae combines original desktop-application work with two upstream project
 - Project: [SpeedyOrc-C/HoYo-Glyphs](https://github.com/SpeedyOrc-C/HoYo-Glyphs)
 - Pinned source: `main@ad0c03ce9792d623c6a6161e5582a01903bd5d97`
 - Contributors include 陈湛明 and 吴松原.
-- Local license copy: [`LICENSE`](./LICENSE)
+- Local license copy: [`LICENSES/HoYo-Glyphs-NONCOMMERCIAL.txt`](./LICENSES/HoYo-Glyphs-NONCOMMERCIAL.txt)
 
 The HoYo-Glyphs font and alphabet resources use a custom license. Among other requirements, it prohibits commercial use, requires source links when fonts are embedded, and requires modified fonts to remain available with links to both their modified and unmodified sources. Read the complete license before redistributing or embedding these resources.
 
@@ -24,7 +24,11 @@ The original Martian implementation is licensed under the MIT License. Its copyr
 
 ## HoyoGraphae application code
 
-A separate license for the original HoyoGraphae application code has not yet been declared. Do not assume that either upstream resource license automatically applies to new application code.
+Original HoyoGraphae Qt/Python application code and project-specific documentation are licensed under the root [MIT License](./LICENSE), Copyright © 2026 Songyuan Wu (吴松原, Etymodes). This license does not relicense the separately identified upstream resources.
+
+## HoyoGraphae branding
+
+The HoyoGraphae name, logo, and icon artwork are Copyright © 2026 Songyuan Wu (吴松原, Etymodes). They are not included in the application-code MIT license unless separately licensed in writing.
 
 ## Trademark and affiliation
 

@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="./src/hoyographae/resources/hoyographae-icon.svg" width="184" alt="HoyoGraphae icon">
+  <img src="./assets/branding/hoyographae-icon.png" width="184" alt="HoyoGraphae icon">
 </p>
 
 <h1 align="center">HoyoGraphae</h1>
 
-<p align="center"><strong>A local workspace for HoYoverse constructed scripts</strong></p>
+<p align="center"><strong>A local multifunction workbench for constructed scripts across miHoYo/HoYoverse games</strong></p>
 
 <p align="center"><a href="./README.md">简体中文</a> · <strong>English</strong></p>
 
@@ -15,7 +15,7 @@
 
 | Module | Purpose | Current status |
 | --- | --- | --- |
-| Font library | Collect and filter constructed-script fonts from the games | Latest font sources inherited; desktop app can load local OpenType fonts |
+| Font library | Collect and filter constructed-script fonts from the games | Initial upstream font snapshots pinned; desktop app can load local OpenType fonts |
 | Glyph browser | Browse a font by character, Unicode value, and glyph | Qt prototype available |
 | Text generator | Type for live preview and export a transparent or solid-background PNG | Qt prototype available |
 | Image text recognition | Locate and transcribe constructed scripts in screenshots | UI and engine boundary reserved; dedicated models still need training |
@@ -48,7 +48,7 @@ The current development source primarily contains the HoYo fonts as `.glyphs` fi
 
 ## Upstream resources and pinned versions
 
-HoyoGraphae is a local application built after both @SpeedyOrc-C and @Etymodes contributed to the related resources. The current source snapshots are pinned as follows:
+HoyoGraphae is maintained by [@Etymodes](https://github.com/Etymodes). Its initial font and writing-system resources come from two upstream projects to which [@SpeedyOrc-C](https://github.com/SpeedyOrc-C) and @Etymodes contributed, and are pinned under their respective licenses and contributor authorization. The current source snapshots are:
 
 | Source | Branch and commit | Location in this repository |
 | --- | --- | --- |
@@ -56,6 +56,10 @@ HoyoGraphae is a local application built after both @SpeedyOrc-C and @Etymodes c
 | [Honkai-3rd-II-Martian](https://github.com/SpeedyOrc-C/Honkai-3rd-II-Martian) | `main@89998b86c83e364d970be639917f422b00d6015b` | `upstream/Honkai-3rd-II-Martian/` |
 
 Both upstream projects currently expose `main` as their only public development branch. The exact machine-readable record is in [`upstreams.lock.json`](./upstreams.lock.json). The inherited HoYo-Glyphs fonts are manually reconstructed resources and are **not extracted game files**.
+
+### Mainline admission policy
+
+HoyoGraphae's long-term scope is to incrementally support constructed scripts, fan-reconstructed fonts, and related browsing and recognition workflows across games developed by miHoYo/HoYoverse. New resources are reviewed on a development branch for provenance, contributor authorization, licensing, technical quality, and regression results. Only reviewed and version-pinned resources are promoted to `main`. Coverage across the games is an ongoing goal—not a claim that the current release contains every game or script, nor that the resources are official releases or extracted game files.
 
 ## Roadmap
 
@@ -82,9 +86,11 @@ Donations are voluntary support. They do not purchase or grant a commercial lice
 
 ## Licenses and notices
 
-- HoYo-Glyphs font and alphabet resources follow the repository root's [custom non-commercial license](./LICENSE), including requirements for embedding, modifications, and source links.
+- Original HoyoGraphae Qt/Python application code is licensed under the root [MIT License](./LICENSE), Copyright © 2026 Songyuan Wu (吴松原, Etymodes).
+- HoYo-Glyphs font and alphabet resources remain under their [custom non-commercial license](./LICENSES/HoYo-Glyphs-NONCOMMERCIAL.txt), including requirements for embedding, modifications, and source links.
 - The original Martian implementation follows the [MIT License](./upstream/Honkai-3rd-II-Martian/LICENSE), Copyright © 2023 陈湛明.
-- A separate license has not yet been selected for original application code; neither upstream license automatically extends to new application code.
+- The HoyoGraphae name, logo, and icon are not included in the application-code MIT license; copyright is reserved unless stated otherwise in writing.
+- This is a mixed-license repository: the root MIT license does not override separately identified resources. See [`LICENSES/README.md`](./LICENSES/README.md) for the license map.
 - See [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) for full provenance and third-party notices.
 
 HoyoGraphae is an unofficial fan project and is not affiliated with, sponsored by, or endorsed by HoYoverse or its affiliates. Game and product names belong to their respective owners.

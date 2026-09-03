@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hoyographae"
+version = "0.1.0"
+description = "A local desktop workbench for HoYoverse-inspired fonts and scripts."
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6>=6.9,<7",
+    "fonttools>=4.59,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+hoyographae = "hoyographae.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["hoyographae*"]
+
+[tool.setuptools.package-data]
+hoyographae = ["resources/*.svg", "resources/*.png", "resources/*.ico"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

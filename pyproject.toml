@@ -17,6 +17,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
+font-build = [
+    "fontmake==3.12.1",
+    "fonttools[lxml,ufo,unicode]==4.64.0",
+    "glyphsLib[defcon,ufo-normalization]==6.14.0",
+]
 
 [project.scripts]
 hoyographae = "hoyographae.app:main"
@@ -29,7 +34,13 @@ where = ["src"]
 include = ["hoyographae*"]
 
 [tool.setuptools.package-data]
-hoyographae = ["resources/*.png", "resources/*.ico"]
+hoyographae = [
+    "resources/*.png",
+    "resources/*.ico",
+    "resources/fonts/*.json",
+    "resources/fonts/*.txt",
+    "resources/fonts/*.ttf",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

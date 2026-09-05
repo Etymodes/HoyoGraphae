@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "format": "TrueType",
+  "toolchain": {
+    "fontmake": "3.12.1",
+    "glyphsLib": "6.14.0",
+    "fonttools": "4.64.0"
+  },
+  "sources": [
+    {
+      "source_id": "amphoreus-circuit",
+      "source_file": "src/Amphoreus-Circuit.glyphs",
+      "build_mode": "instances",
+      "faces": [
+        {
+          "face_id": "amphoreus-circuit--amphoreuscircuit-black-bigchamber",
+          "file": "AmphoreusCircuit-Black&BigChamber.ttf",
+          "family": "Amphoreus Circuit",
+          "style": "Black & Big Chamber",
+          "codepoint_count": 5,
+          "sha256": "635d17a2d2953891b1bb2747cdc4a83b40f8df4f3b2a8f394df1c0c6ef295436"
+        },
+        {
+          "face_id": "amphoreus-circuit--amphoreuscircuit-black-smallchamber",
+          "file": "AmphoreusCircuit-Black&SmallChamber.ttf",
+          "family": "Amphoreus Circuit",
+          "style": "Black & Small Chamber",
+          "codepoint_count": 5,
+          "sha256": "094d9bef7ce5cbfc9dba01d2adb9f7a9fa0c351c569e523181daec046fe1fe47"
+        },
+        {
+          "face_id": "amphoreus-circuit--amphoreuscircuit-extrathin-bigchamber",
+          "file": "AmphoreusCircuit-ExtraThin&BigChamber.ttf",
+          "family": "Amphoreus Circuit",
+          "style": "Extra Thin & Big Chamber",
+          "codepoint_count": 5,
+          "sha256": "4110a0a0e0dcfe1843f33086af614ac9d61f2fa760ee9bbce9d710e4e422bf6f"
+        },
+        {
+          "face_id": "amphoreus-circuit--amphoreuscircuit-extrathin-smallchamber",
+          "file": "AmphoreusCircuit-ExtraThin&SmallChamber.ttf",
+          "family": "Amphoreus Circuit",
+          "style": "Extra Thin & Small Chamber",
+          "codepoint_count": 5,
+          "sha256": "429d82e32d04e83ae1d788b8c0596a1f3c5f4d2222064ef196e33ce2f81cca4d"
+        },
+        {
+          "face_id": "amphoreus-circuit--amphoreuscircuit-regular",
+          "file": "AmphoreusCircuit-Regular.ttf",
+          "family": "Amphoreus Circuit",
+          "style": "Regular",
+          "codepoint_count": 5,
+          "sha256": "3813aa05fda2bb4ba097206e8752620e2d1cafbbdc58aba6bc0c495871e9152e"
+        }
+      ]
+    },
+    {
+      "source_id": "deshret-inscription",
+      "source_file": "src/Deshret-Inscription.glyphs",
+      "build_mode": "master",
+      "faces": [
+        {
+          "face_id": "deshret-inscription--deshretinscription-regular",
+          "file": "DeshretInscription-Regular.ttf",
+          "family": "Deshret Inscription",
+          "style": "Regular",
+          "codepoint_count": 55,
+          "sha256": "f4380ce8ce2e95e7b7ce879241efa524b1f086d93d032aabffb119ab16627960"
+        }
+      ]
+    },
+    {
+      "source_id": "font-ainee",
+      "source_file": "src/Font-Ainee.glyphs",
+      "build_mode": "master",
+      "faces": [
+        {
+          "face_id": "font-ainee--fontainee-regular",
+          "file": "FontAinee-Regular.ttf",
+          "family": "Font Ainee",
+          "style": "Regular",
+          "codepoint_count": 55,
+          "sha256": "18189f23d1df9b5b44775718ba322128fa2e775e8294d3b39fff77bee39a1fb2"
+        }
+      ]
+    },
+    {
+      "source_id": "inazuma-brush",
+      "source_file": "src/Inazuma-Brush.glyphs",
+      "build_mode": "instances",
+      "faces": [
+        {
+          "face_id": "inazuma-brush--inazumabrush-regular",
+          "file": "InazumaBrush-Regular.ttf",
+          "family": "Inazuma Brush",
+          "style": "Regular",
+          "codepoint_count": 55,
+          "sha256": "71225f4a16a576e6b2670e412277c22b6e02433a4c17febb6f257079f780061c"
+        }
+      ]
+    },
+    {
+      "source_id": "khaenriah-sun",
+      "source_file": "src/Khaenriah-Sun.glyphs",
+      "build_mode": "instances",
+      "faces": [
+        {
+          "face_id": "khaenriah-sun--khaenriahsun-chasm",
+          "file": "KhaenriahSun-Chasm.ttf",
+          "family": "Khaenriah Sun",
+          "style": "Chasm",
+          "codepoint_count": 59,
+          "sha256": "1c5409b39f60fc42ecbe94f8ffbe5b2d2f4be041ac0195ae93ff12f292ada97b"
+        },
+        {
+          "face_id": "khaenriah-sun--khaenriahsun-regular",
+          "file": "KhaenriahSun-Regular.ttf",
+          "family": "Khaenriah Sun",
+          "style": "Regular",
+          "codepoint_count": 59,
+          "sha256": "421a2b7297adca302be4f44e824a4f98d22c267e4042b25ef921ce2e9e85c621"
+        }
+      ]
+    },
+    {
+      "source_id": "star-rail-neue",
+      "source_file": "src/Star-Rail-Neue.glyphs",
+      "build_mode": "star-rail",
+      "faces": [
+        {
+          "face_id": "star-rail-neue--starrailneue-sans-bold",
+          "file": "StarRailNeue-Sans-Bold.ttf",
+          "family": "Star Rail Neue",
+          "style": "Sans-Bold",
+          "codepoint_count": 57,
+          "sha256": "ffb850b7a7f69cc9566444599c4056a7d368534e0367931a1744f5ae4c12ef27"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-sans-extralight",
+          "file": "StarRailNeue-Sans-ExtraLight.ttf",
+          "family": "Star Rail Neue",
+          "style": "Sans-ExtraLight",
+          "codepoint_count": 57,
+          "sha256": "7c71a7a30d5c28c22eefd82bcebb614faab264cccc3bc97c201462fd36c3bcfe"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-sans-light",
+          "file": "StarRailNeue-Sans-Light.ttf",
+          "family": "Star Rail Neue",
+          "style": "Sans-Light",
+          "codepoint_count": 57,
+          "sha256": "538a186679cf3a43da09c295ac98530c38b56b7079bad84f854756a6d3b7c237"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-sans-regular",
+          "file": "StarRailNeue-Sans-Regular.ttf",
+          "family": "Star Rail Neue",
+          "style": "Sans-Regular",
+          "codepoint_count": 57,
+          "sha256": "f41ec796012021d1dc67e6e13512ce68c4c8eb009af3b1a234e4fab9902893bf"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-sans-semibold",
+          "file": "StarRailNeue-Sans-SemiBold.ttf",
+          "family": "Star Rail Neue",
+          "style": "Sans-SemiBold",
+          "codepoint_count": 57,
+          "sha256": "4c01233b79bfa9d2e24f348e7c3ff99991d78cc9a94947f2d87572d7944444c5"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-serif-bold",
+          "file": "StarRailNeue-Serif-Bold.ttf",
+          "family": "Star Rail Neue",
+          "style": "Serif-Bold",
+          "codepoint_count": 57,
+          "sha256": "cea714fa154e7a419cb0a50b52aad5f6125096a00189b96d58cc1dcf3250439f"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-serif-extralight",
+          "file": "StarRailNeue-Serif-ExtraLight.ttf",
+          "family": "Star Rail Neue",
+          "style": "Serif-ExtraLight",
+          "codepoint_count": 57,
+          "sha256": "2e68328c4cb51465d02b9454c9894a339ee7e34d33a166197e1d436b7b37f037"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-serif-light",
+          "file": "StarRailNeue-Serif-Light.ttf",
+          "family": "Star Rail Neue",
+          "style": "Serif-Light",
+          "codepoint_count": 57,
+          "sha256": "2e6b40b8b34aef321b181c228ab42fd6891a2c5ad498ee8c816137f5ec75e44e"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-serif-regular",
+          "file": "StarRailNeue-Serif-Regular.ttf",
+          "family": "Star Rail Neue",
+          "style": "Serif-Regular",
+          "codepoint_count": 57,
+          "sha256": "85cf100e16e1f2d3a661d6c74d786c8d60fd1db189702db0252db46628f388df"
+        },
+        {
+          "face_id": "star-rail-neue--starrailneue-serif-semibold",
+          "file": "StarRailNeue-Serif-SemiBold.ttf",
+          "family": "Star Rail Neue",
+          "style": "Serif-SemiBold",
+          "codepoint_count": 57,
+          "sha256": "7bc9c5f243b91c60b67aac84e13ff1d59c0621b410afaa3c55e49afdad586d0f"
+        }
+      ]
+    },
+    {
+      "source_id": "sumeru-scribe",
+      "source_file": "src/Sumeru-Scribe.glyphs",
+      "build_mode": "instances",
+      "faces": [
+        {
+          "face_id": "sumeru-scribe--sumeruscribe-regular",
+          "file": "SumeruScribe-Regular.ttf",
+          "family": "Sumeru Scribe",
+          "style": "Regular",
+          "codepoint_count": 53,
+          "sha256": "0d1704afbe5e990e24358b58a64a2184d4d09a35fddb0306c674e9af2e1831cd"
+        }
+      ]
+    },
+    {
+      "source_id": "teyvat-black",
+      "source_file": "src/Teyvat-Black.glyphs",
+      "build_mode": "master",
+      "faces": [
+        {
+          "face_id": "teyvat-black--teyvatblack-regular",
+          "file": "TeyvatBlack-Regular.ttf",
+          "family": "Teyvat Black",
+          "style": "Regular",
+          "codepoint_count": 58,
+          "sha256": "d3fa4cd1229b370b4d9fde0cf28debd62fad1de678b7ef642e48d4f27e28a7a7"
+        }
+      ]
+    },
+    {
+      "source_id": "xianzhou-seal",
+      "source_file": "src/Xianzhou-Seal.glyphs",
+      "build_mode": "instances",
+      "faces": [
+        {
+          "face_id": "xianzhou-seal--xianzhouseal-bold",
+          "file": "XianzhouSeal-Bold.ttf",
+          "family": "Xianzhou Seal",
+          "style": "Bold",
+          "codepoint_count": 64,
+          "sha256": "c5f06b1fa7996a84d571e66c3ae01597cf2471f97da76022369329b04aef85fa"
+        },
+        {
+          "face_id": "xianzhou-seal--xianzhouseal-extralight",
+          "file": "XianzhouSeal-ExtraLight.ttf",
+          "family": "Xianzhou Seal",
+          "style": "ExtraLight",
+          "codepoint_count": 64,
+          "sha256": "961db2391d54b465580be56df28ca984ee850702e05af6284fb7e61e61b7a226"
+        },
+        {
+          "face_id": "xianzhou-seal--xianzhouseal-light",
+          "file": "XianzhouSeal-Light.ttf",
+          "family": "Xianzhou Seal",
+          "style": "Light",
+          "codepoint_count": 64,
+          "sha256": "86853d0df124ad74e60d3b47b250e726dc4811987710b9b58eb9ddce3a759949"
+        },
+        {
+          "face_id": "xianzhou-seal--xianzhouseal-regular",
+          "file": "XianzhouSeal-Regular.ttf",
+          "family": "Xianzhou Seal",
+          "style": "Regular",
+          "codepoint_count": 64,
+          "sha256": "c6e6523bee127d3b05ff1d652916410ccdab8ecff791ac58d569582c615dc4b4"
+        },
+        {
+          "face_id": "xianzhou-seal--xianzhouseal-semibold",
+          "file": "XianzhouSeal-SemiBold.ttf",
+          "family": "Xianzhou Seal",
+          "style": "SemiBold",
+          "codepoint_count": 64,
+          "sha256": "cf81536a44a2a6cca7949a51dc5eb3da6ee2b78a9c4d1c6bff737d0538c9e267"
+        }
+      ]
+    },
+    {
+      "source_id": "zzz-a",
+      "source_file": "src/ZZZ-A.glyphs",
+      "build_mode": "master",
+      "faces": [
+        {
+          "face_id": "zzz-a--zzza-zzza",
+          "file": "ZZZA-ZZZA.ttf",
+          "family": "ZZZ A",
+          "style": "ZZZ A",
+          "codepoint_count": 57,
+          "sha256": "ae958377557cd29c7b985e0e78d33f015fb9793a15ae389ef4785ececc4abf49"
+        }
+      ]
+    },
+    {
+      "source_id": "zzz-system",
+      "source_file": "src/ZZZ-System.glyphs",
+      "build_mode": "master",
+      "faces": [
+        {
+          "face_id": "zzz-system--zzzsystem-zzzsystem",
+          "file": "ZZZSystem-ZZZSystem.ttf",
+          "family": "ZZZ System",
+          "style": "ZZZ System",
+          "codepoint_count": 55,
+          "sha256": "f14516ff6e175e363aab2ffaa98cbc8c5cafca6d69e29f3964254ed2b2108f6f"
+        }
+      ]
+    }
+  ]
+}

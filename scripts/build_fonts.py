@@ -26,6 +26,7 @@ EXPECTED_TOOLCHAIN = {
     "glyphsLib": "6.14.0",
     "fonttools": "4.64.0",
 }
+TEXT_OUTPUTS = frozenset({"LICENSE.txt", "manifest.json"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -244,10 +245,21 @@ def _build_manifest(work_root: Path, toolchain: dict[str, str]) -> tuple[Path, d
     return bundled_root, manifest
 
 
+def _comparable_bytes(path: Path) -> bytes:
+    content = path.read_bytes()
+    if path.name in TEXT_OUTPUTS:
+        return content.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return content
+
+
 def _compare_output(generated_root: Path, output_root: Path) -> None:
-    generated = {path.name: path.read_bytes() for path in generated_root.iterdir()}
+    generated = {path.name: _comparable_bytes(path) for path in generated_root.iterdir()}
     existing = (
-        {path.name: path.read_bytes() for path in output_root.iterdir() if path.is_file()}
+        {
+            path.name: _comparable_bytes(path)
+            for path in output_root.iterdir()
+            if path.is_file()
+        }
         if output_root.is_dir()
         else {}
     )

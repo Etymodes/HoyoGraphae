@@ -6,7 +6,7 @@ import pytest
 from fontTools.ttLib import TTFont
 
 import hoyographae
-from scripts.build_fonts import FontBuildError, _publish_output
+from scripts.build_fonts import FontBuildError, _compare_output, _publish_output
 
 
 EXPECTED_SOURCES = {
@@ -65,3 +65,16 @@ def test_font_publisher_refuses_to_delete_unmanaged_files(tmp_path: Path) -> Non
         _publish_output(generated_root, output_root)
 
     assert unmanaged.read_text(encoding="utf-8") == "user data"
+
+
+def test_font_check_ignores_platform_line_endings(tmp_path: Path) -> None:
+    generated_root = tmp_path / "generated"
+    output_root = tmp_path / "output"
+    generated_root.mkdir()
+    output_root.mkdir()
+    (generated_root / "manifest.json").write_bytes(b'{\n  "schema_version": 1\n}\n')
+    (output_root / "manifest.json").write_bytes(
+        b'{\r\n  "schema_version": 1\r\n}\r\n'
+    )
+
+    _compare_output(generated_root, output_root)

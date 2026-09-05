@@ -171,6 +171,7 @@ Windows 源码构建已经验证：独立 `.venv`、editable 安装、10 项切�
 - `Star-Rail-Neue` 只在临时 Designspace 中补齐 Serif 条件轴范围，源文件保持不变，并生成 Sans/Serif 各 5 个字重；
 - 生成清单记录稳定 face ID、文件名、字体家族、样式、字符数和 SHA-256；
 - 二次从零构建已与首轮结果逐字节一致；运行时注册留到独立切片。
+- Windows 首次 `--check` 已确认 29 个 TTF 均一致，仅 Git 检出的 CRLF 清单触发误报；校验器现只对文本产物统一换行后比较，字体二进制仍保持严格逐字节校验，等待 Windows 复验。
 
 ### 7.1 信息架构
 
@@ -410,3 +411,4 @@ license_id / provenance
 - `v.1.1` 切片 1 发布到 `develop`：默认首页、五页双语即时切换和 `QSettings` 持久化。
 - Windows 实机完成切片 1 验收：中英文无缺字、全页即时切换、关闭后语言选择保留。
 - 建立切片 2 字体构建门禁：11 个 Glyphs 源可重复生成 29 个带校验清单的静态 TTF；不在构建时改写源文件。
+- 修正 Windows `core.autocrlf` 导致的清单换行误报；只规范化文本比较，不放宽 TTF 字节校验。

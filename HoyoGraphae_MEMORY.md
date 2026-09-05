@@ -85,11 +85,17 @@ HoyoGraphae 是非官方同人项目，与米哈游、HoYoverse 及其关联方�
 发布基线：
 
 - `main`：`d2472c533262ba4fc53d181c4185de883c5e5073`
-- `develop`：`d2472c533262ba4fc53d181c4185de883c5e5073`
+- `develop`：`v.1.1` 活跃开发分支；最近已验证的功能修复提交为 `7d235935ff908217526d900d998f5cfc344fe327`
 - 旧主线归档标签：`archive/pre-hoyographae-rebuild-20260903`
 - 旧 `patch-1` 归档标签：`archive/pre-hoyographae-rebuild-20260903-patch-1`
 
 开发原则：新功能先进入 `develop` 检查；来源、许可、测试和界面验收通过后再更新 `main`。
+
+### Augusta 与 GitHub 的传输边界
+
+- 2026-09-05，Augusta 对 `github.com:443` 的两次 `git fetch` 分别以连接超时和连接重置退出（均为 Git 退出码 128）；同一时段 GitHub 连接器能够读取 `develop@7d235935ff908217526d900d998f5cfc344fe327`，因此当前证据指向 Augusta 到 GitHub HTTPS 的网络路径，而不是仓库引用或授权故障。
+- 两次有实质区别的直接尝试均失败后停止原样重试，不据此永久修改全局 Git、代理、TLS 或防火墙设置。端口、代理和网络状态均属于需要重新探测的临时状态。
+- 需要继续同步时，优先交付以已验证本地基线为前提的 Git bundle；在 Augusta 上依次独立验证 SHA-256、`git bundle verify`、干净工作区、精确目标提交、仅快进更新和项目测试。
 
 ## 5. 当前版本 `v0.1.0`
 
@@ -412,3 +418,4 @@ license_id / provenance
 - Windows 实机完成切片 1 验收：中英文无缺字、全页即时切换、关闭后语言选择保留。
 - 建立切片 2 字体构建门禁：11 个 Glyphs 源可重复生成 29 个带校验清单的静态 TTF；不在构建时改写源文件。
 - 修正 Windows `core.autocrlf` 导致的清单换行误报；只规范化文本比较，不放宽 TTF 字节校验。
+- 记录 Augusta 到 GitHub HTTPS 端口 443 的“超时后重置”传输故障；两次直接尝试后改走带哈希门禁的离线 Git bundle，不把问题误判为仓库授权或分支故障。

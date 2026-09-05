@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QSettings, Qt, Signal
-from PySide6.QtGui import QFontDatabase, QIcon, QPixmap
+from PySide6.QtGui import QFont, QFontDatabase, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
 )
 
 from . import __version__
-from .fonts import FontInspectionError, FontMetadata, inspect_font
+from .fonts import FontInspectionError, FontMetadata, bundled_font_faces, inspect_font
 from .i18n import LanguageManager
 from .pages import FontLibraryPage, GlyphBrowserPage, HomePage, OcrPage, TextPreviewPage
 
@@ -30,7 +30,16 @@ from .pages import FontLibraryPage, GlyphBrowserPage, HomePage, OcrPage, TextPre
 class LoadedFont:
     metadata: FontMetadata
     family: str
+    style: str
     application_font_id: int
+    face_id: str | None = None
+
+    def qfont(self, point_size: int) -> QFont:
+        font = QFont(self.family)
+        if self.style:
+            font.setStyleName(self.style)
+        font.setPointSize(point_size)
+        return font
 
 
 class FontStore(QObject):
@@ -42,12 +51,22 @@ class FontStore(QObject):
         self.language = language
         self.fonts: list[LoadedFont] = []
         self.current: LoadedFont | None = None
+        self.load_errors: dict[str, str] = {}
+        self.load_bundled()
 
-    def add(self, path: str) -> LoadedFont:
+    def add(
+        self,
+        path: str,
+        *,
+        face_id: str | None = None,
+        style: str = "",
+        make_current: bool = True,
+    ) -> LoadedFont:
         metadata = inspect_font(path)
         for index, loaded in enumerate(self.fonts):
             if loaded.metadata.path == metadata.path:
-                self.select(index)
+                if make_current:
+                    self.select(index)
                 return loaded
 
         font_id = QFontDatabase.addApplicationFont(str(metadata.path))
@@ -58,12 +77,40 @@ class FontStore(QObject):
             QFontDatabase.removeApplicationFont(font_id)
             raise FontInspectionError(self.language.text("font.family_error"))
 
-        loaded = LoadedFont(metadata, families[0], font_id)
+        loaded = LoadedFont(metadata, families[0], style, font_id, face_id)
         self.fonts.append(loaded)
-        self.current = loaded
+        if make_current:
+            self.current = loaded
         self.fonts_changed.emit()
-        self.current_changed.emit(loaded)
+        if make_current:
+            self.current_changed.emit(loaded)
         return loaded
+
+    def load_bundled(self) -> None:
+        try:
+            faces = bundled_font_faces()
+        except FontInspectionError as exc:
+            self.load_errors["manifest"] = str(exc)
+            return
+
+        first_loaded: LoadedFont | None = None
+        for face in faces:
+            try:
+                loaded = self.add(
+                    str(face.path),
+                    face_id=face.face_id,
+                    style=face.style,
+                    make_current=False,
+                )
+            except FontInspectionError as exc:
+                self.load_errors[face.face_id] = str(exc)
+                continue
+            if first_loaded is None:
+                first_loaded = loaded
+
+        if first_loaded is not None:
+            self.current = first_loaded
+            self.current_changed.emit(first_loaded)
 
     def select(self, row: int) -> None:
         if not 0 <= row < len(self.fonts):

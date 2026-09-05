@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -20,6 +21,34 @@ class FontMetadata:
     path: Path
     display_name: str
     codepoints: tuple[int, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class BundledFontFace:
+    face_id: str
+    path: Path
+    style: str
+
+
+def bundled_font_faces() -> tuple[BundledFontFace, ...]:
+    """Read the generated package manifest without depending on the working directory."""
+
+    font_root = Path(__file__).parent / "resources" / "fonts"
+    try:
+        manifest = json.loads(
+            (font_root / "manifest.json").read_text(encoding="utf-8")
+        )
+        return tuple(
+            BundledFontFace(
+                face_id=face["face_id"],
+                path=font_root / face["file"],
+                style=face["style"],
+            )
+            for source in manifest["sources"]
+            for face in source["faces"]
+        )
+    except (KeyError, OSError, TypeError, json.JSONDecodeError) as exc:
+        raise FontInspectionError(f"无法读取内置字体清单：{exc}") from exc
 
 
 def validate_font_path(path: str | Path) -> Path:

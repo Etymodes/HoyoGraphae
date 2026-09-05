@@ -15,9 +15,9 @@
 
 | Module | Purpose | Current status |
 | --- | --- | --- |
-| Font library | Collect and filter constructed-script fonts from the games | Initial upstream font snapshots pinned; desktop app can load local OpenType fonts |
-| Glyph browser | Browse a font by character, Unicode value, and glyph | Qt prototype available |
-| Text generator | Type for live preview and export a transparent or solid-background PNG | Qt prototype available |
+| Font library | Collect and filter constructed-script fonts from the games | 11 sources build into 29 bundled font faces that load at startup; game catalog pending |
+| Glyph browser | Browse a font by character, Unicode value, and glyph | Works immediately with the current bundled font; bidirectional catalog pending |
+| Text generator | Type for live preview and export a transparent or solid-background PNG | Works immediately with the current bundled font; font selector and virtual keyboard pending |
 | Image text recognition | Locate and transcribe constructed scripts in screenshots | UI and engine boundary reserved; dedicated models still need training |
 
 Martian is not a conventional font: it is a compositional vector writing system. HoyoGraphae preserves the complete upstream implementation and will port it natively to Qt `QPainter` instead of embedding a browser runtime.
@@ -44,7 +44,7 @@ py -3.11 -m venv .venv
 & .\.venv\Scripts\python.exe -m hoyographae
 ```
 
-The current development source primarily contains the HoYo fonts as `.glyphs` files. To exercise the desktop prototype, load an already compiled `.ttf` or `.otf` file from the application.
+The current development branch includes 29 static TTFs reproducibly built from 11 `.glyphs` sources. They load into the application process at startup, so using the prototype requires neither Windows font installation nor selecting an external font. The current list and “Choose font files” button are transitional UI and will be replaced by the game-and-script catalog.
 
 ## Upstream resources and pinned versions
 
@@ -64,7 +64,7 @@ HoyoGraphae's long-term scope is to incrementally support constructed scripts, f
 ## Roadmap
 
 - **M0 · Desktop foundation:** font loading, glyph grid, live typing preview, PNG export, and an explicit OCR placeholder.
-- **M1 · Bundled library:** batch font builds and catalog; variable axes; native Qt Martian rendering with golden-image regression tests.
+- **M1 · Bundled library:** batch builds and startup loading are complete; the game catalog, variable axes, native Qt Martian rendering, and golden-image regression tests remain.
 - **M2 · Local OCR:** begin with one script and manually selected text lines, freeze an evaluation set and publish accuracy, then add automatic text detection.
 
 ## Support the developers

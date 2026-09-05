@@ -6,6 +6,7 @@ import pytest
 from fontTools.ttLib import TTFont
 
 import hoyographae
+from hoyographae.fonts import bundled_font_faces
 from scripts.build_fonts import FontBuildError, _compare_output, _publish_output
 
 
@@ -50,6 +51,14 @@ def test_bundled_font_manifest_matches_valid_font_files() -> None:
             assert font["name"].getBestSubFamilyName() == face["style"]
             assert len(font.getBestCmap() or {}) == face["codepoint_count"]
             assert face["codepoint_count"] > 0
+
+
+def test_runtime_font_faces_follow_the_bundled_manifest() -> None:
+    faces = bundled_font_faces()
+
+    assert len(faces) == 29
+    assert len({face.face_id for face in faces}) == 29
+    assert all(face.path.is_file() for face in faces)
 
 
 def test_font_publisher_refuses_to_delete_unmanaged_files(tmp_path: Path) -> None:

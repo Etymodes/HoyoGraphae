@@ -138,6 +138,7 @@ class FontLibraryPage(QWidget):
 
         self.summary = QLabel()
         self.summary.setObjectName("mutedLabel")
+        self.summary.setWordWrap(True)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 28, 32, 28)
@@ -152,6 +153,7 @@ class FontLibraryPage(QWidget):
         self.store.fonts_changed.connect(self._refresh)
         self.store.current_changed.connect(self._show_current)
         self.language.changed.connect(self.retranslate)
+        self._refresh()
         self.retranslate()
 
     def _choose_fonts(self) -> None:
@@ -190,17 +192,29 @@ class FontLibraryPage(QWidget):
         self.font_list.blockSignals(False)
 
     def _show_current(self, loaded) -> None:
+        lines: list[str] = []
         if loaded is None:
-            self.summary.setText(self.language.text("font.empty"))
-            return
-        self.summary.setText(
-            self.language.text(
-                "font.current",
-                name=loaded.metadata.display_name,
-                count=len(loaded.metadata.codepoints),
-                path=loaded.metadata.path,
+            lines.append(self.language.text("font.empty"))
+        else:
+            lines.append(
+                self.language.text(
+                    "font.current",
+                    name=loaded.metadata.display_name,
+                    count=len(loaded.metadata.codepoints),
+                    path=loaded.metadata.path,
+                )
             )
-        )
+        if self.store.load_errors:
+            lines.append(
+                self.language.text(
+                    "font.load_failures", count=len(self.store.load_errors)
+                )
+            )
+            lines.extend(
+                f"{face_id}: {message}"
+                for face_id, message in self.store.load_errors.items()
+            )
+        self.summary.setText("\n".join(lines))
 
     def retranslate(self, _language: str | None = None) -> None:
         self.title.setText(self.language.text("font.title"))
@@ -259,6 +273,7 @@ class GlyphBrowserPage(QWidget):
         self.store.current_changed.connect(self._font_changed)
         self.language.changed.connect(self.retranslate)
         self.retranslate()
+        self._font_changed(self.store.current)
 
     def _font_changed(self, loaded) -> None:
         self.search.clear()
@@ -313,8 +328,7 @@ class GlyphBrowserPage(QWidget):
             self.table.setColumnWidth(column, 104)
 
         loaded = self.store.current
-        display_font = QFont(loaded.family if loaded else "")
-        display_font.setPointSize(25)
+        display_font = loaded.qfont(25) if loaded else QFont()
         for offset, codepoint in enumerate(visible):
             row, column = divmod(offset, self.COLUMN_COUNT)
             cell = QWidget()
@@ -429,9 +443,8 @@ class TextPreviewPage(QWidget):
         self.retranslate()
 
     def _font(self) -> QFont:
-        font = QFont(self.store.current.family if self.store.current else "")
-        font.setPointSize(self.size_input.value())
-        return font
+        loaded = self.store.current
+        return loaded.qfont(self.size_input.value()) if loaded else QFont()
 
     def _render(self):
         background = None if self.transparent.isChecked() else self.background

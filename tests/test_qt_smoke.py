@@ -1,4 +1,5 @@
 import os
+from dataclasses import replace
 
 import pytest
 
@@ -10,7 +11,10 @@ from PySide6.QtCore import QSettings
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import QApplication
 
-from hoyographae.app import MainWindow
+import hoyographae.app as app_module
+from hoyographae.app import FontStore, MainWindow
+from hoyographae.fonts import bundled_font_faces
+from hoyographae.i18n import LanguageManager
 from hoyographae.rendering import render_text_image
 
 
@@ -19,17 +23,46 @@ def application():
     return QApplication.instance() or QApplication([])
 
 
-def test_main_window_starts_on_home_without_loaded_fonts(application, tmp_path) -> None:
+def test_main_window_starts_on_home_with_bundled_fonts(application, tmp_path) -> None:
     settings = QSettings(str(tmp_path / "settings.ini"), QSettings.Format.IniFormat)
+    bundled = bundled_font_faces()
     window = MainWindow(settings)
     try:
         assert window.pages.count() == 5
         assert window.pages.currentWidget() is window.home_page
         assert window.navigation.item(0).text() == "首页"
-        assert window.store.fonts == []
-        assert window.store.current is None
+        assert len(window.store.fonts) == 29
+        assert window.store.current is window.store.fonts[0]
+        assert [font.face_id for font in window.store.fonts] == [
+            face.face_id for face in bundled
+        ]
+        assert [font.style for font in window.store.fonts] == [
+            face.style for face in bundled
+        ]
+        assert window.store.load_errors == {}
+        assert window.font_library_page.font_list.count() == 29
+        assert window.glyph_browser_page._matches == window.store.current.metadata.codepoints
+        assert window.text_preview_page._font().styleName() == window.store.current.style
     finally:
         window.close()
+
+
+def test_one_bundled_font_failure_does_not_block_the_rest(
+    application, monkeypatch, tmp_path
+) -> None:
+    faces = bundled_font_faces()[:2]
+    broken = replace(faces[0], path=tmp_path / "missing.ttf")
+    monkeypatch.setattr(app_module, "bundled_font_faces", lambda: (broken, faces[1]))
+
+    store = FontStore(
+        LanguageManager(
+            QSettings(str(tmp_path / "settings.ini"), QSettings.Format.IniFormat)
+        )
+    )
+
+    assert [font.face_id for font in store.fonts] == [faces[1].face_id]
+    assert store.current is store.fonts[0]
+    assert list(store.load_errors) == [broken.face_id]
 
 
 def test_language_combo_updates_every_page_and_persists(application, tmp_path) -> None:

@@ -21,7 +21,7 @@ TRANSLATIONS = {
         "home.subtitle": "米哈游游戏架空文字综合工作台",
         "home.intro": (
             "集中查阅、输入和导出游戏中的人工重建架空文字。"
-            "项目将逐步加入内置字体、组合式书写系统和专用 OCR。"
+            "项目已内置首批字体，并将逐步加入组合式书写系统和专用 OCR。"
         ),
         "home.features_title": "主要功能",
         "home.features": "字体管理 · 字形正反查 · 实时排版与图片导出 · 图片文字识别",
@@ -30,9 +30,10 @@ TRANSLATIONS = {
         "home.version": "当前版本：{version}",
         "home.notice": "非官方同人项目，与米哈游及其关联方没有隶属、赞助或背书关系。",
         "font.title": "字体管理",
-        "font.subtitle": "当前版本可载入本机字体；下一步将改为自动加载项目内置字体。",
+        "font.subtitle": "项目内置字体已自动载入；按游戏整理的目录界面将在后续切片替换当前列表。",
         "font.add": "＋ 选择字体文件",
-        "font.empty": "尚未载入字体",
+        "font.empty": "没有可用的内置字体",
+        "font.load_failures": "内置字体载入失败：{count} 项",
         "font.dialog_title": "选择字体文件",
         "font.warning_title": "部分字体未载入",
         "font.qt_load_error": "Qt 无法载入该字体用于屏幕预览",
@@ -43,7 +44,7 @@ TRANSLATIONS = {
         "glyph.search": "筛选，例如：星、U+0041、LATIN CAPITAL",
         "glyph.previous": "← 上一页",
         "glyph.next": "下一页 →",
-        "glyph.load_font": "请先在字体管理中载入字体",
+        "glyph.load_font": "没有可用的内置字体",
         "glyph.page": "第 {page} / {pages} 页 · {count:,} 项",
         "typesetter.title": "实时打字",
         "typesetter.subtitle": "键盘输入会使用当前字体实时排版，并可导出透明或纯色背景 PNG。",
@@ -52,7 +53,7 @@ TRANSLATIONS = {
         "typesetter.background": "背景颜色",
         "typesetter.transparent": "透明背景",
         "typesetter.export": "导出 PNG",
-        "typesetter.default_font": "当前使用系统默认字体",
+        "typesetter.default_font": "没有可用的内置字体；当前使用系统默认字体",
         "typesetter.current_font": "当前字体：{name}",
         "typesetter.foreground_dialog": "选择文字颜色",
         "typesetter.background_dialog": "选择背景颜色",
@@ -84,7 +85,7 @@ TRANSLATIONS = {
         "home.subtitle": "A constructed-script workbench for HoyoVerse games",
         "home.intro": (
             "Browse, type, and export fan-reconstructed scripts from the games. "
-            "Bundled fonts, compositional writing systems, and dedicated OCR will be added incrementally."
+            "The first fonts are bundled; compositional writing systems and dedicated OCR will be added incrementally."
         ),
         "home.features_title": "Core features",
         "home.features": "Font library · Bidirectional glyph lookup · Live typesetting and image export · Image OCR",
@@ -93,9 +94,10 @@ TRANSLATIONS = {
         "home.version": "Current version: {version}",
         "home.notice": "An unofficial fan project not affiliated with, sponsored by, or endorsed by HoyoVerse.",
         "font.title": "Font Library",
-        "font.subtitle": "This version loads local fonts; the next step will load the bundled project fonts automatically.",
+        "font.subtitle": "Bundled project fonts load automatically; a game-organized catalog will replace this list in a later slice.",
         "font.add": "+ Choose font files",
-        "font.empty": "No font loaded",
+        "font.empty": "No bundled font is available",
+        "font.load_failures": "Bundled fonts that failed to load: {count}",
         "font.dialog_title": "Choose font files",
         "font.warning_title": "Some fonts could not be loaded",
         "font.qt_load_error": "Qt could not load this font for preview",
@@ -106,7 +108,7 @@ TRANSLATIONS = {
         "glyph.search": "Filter, for example: A, U+0041, LATIN CAPITAL",
         "glyph.previous": "← Previous",
         "glyph.next": "Next →",
-        "glyph.load_font": "Load a font in Font Library first",
+        "glyph.load_font": "No bundled font is available",
         "glyph.page": "Page {page} / {pages} · {count:,} items",
         "typesetter.title": "Live Typesetter",
         "typesetter.subtitle": "Type with the current font and export a PNG with a transparent or solid background.",
@@ -115,7 +117,7 @@ TRANSLATIONS = {
         "typesetter.background": "Background color",
         "typesetter.transparent": "Transparent background",
         "typesetter.export": "Export PNG",
-        "typesetter.default_font": "Using the system default font",
+        "typesetter.default_font": "No bundled font is available; using the system default font",
         "typesetter.current_font": "Current font: {name}",
         "typesetter.foreground_dialog": "Choose text color",
         "typesetter.background_dialog": "Choose background color",

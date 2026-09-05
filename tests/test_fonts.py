@@ -7,7 +7,6 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from hoyographae.fonts import (
     FontInspectionError,
     display_character,
-    format_codepoint,
     inspect_font,
     validate_font_path,
 )
@@ -61,9 +60,6 @@ def test_validate_font_path_rejects_missing_and_unknown_files(tmp_path: Path) ->
         validate_font_path(text_path)
 
 
-def test_codepoint_helpers() -> None:
-    assert format_codepoint(0x41) == "U+0041"
-    assert format_codepoint(0x1F600) == "U+01F600"
+def test_display_character() -> None:
     assert display_character(0x41) == "A"
     assert display_character(0x0A) == "·"
-

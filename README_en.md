@@ -15,8 +15,8 @@
 
 | Module | Purpose | Current status |
 | --- | --- | --- |
-| Font library | Collect and filter constructed-script fonts from the games | 11 sources build into 29 bundled font faces that load at startup; game catalog pending |
-| Glyph browser | Browse a font by character, Unicode value, and glyph | Works immediately with the current bundled font; bidirectional catalog pending |
+| Font library | Collect and inspect constructed-script fonts from the games | 29 bundled font faces load at startup and appear as a read-only inventory; game catalog pending |
+| Glyph browser | Compare ordinary input characters with constructed-script glyphs | Uses its own font selector independently of Font Library; bidirectional catalog pending |
 | Text generator | Type for live preview and export a transparent or solid-background PNG | Works immediately with the current bundled font; font selector and virtual keyboard pending |
 | Image text recognition | Locate and transcribe constructed scripts in screenshots | UI and engine boundary reserved; dedicated models still need training |
 
@@ -44,7 +44,7 @@ py -3.11 -m venv .venv
 & .\.venv\Scripts\python.exe -m hoyographae
 ```
 
-The current development branch includes 29 static TTFs reproducibly built from 11 `.glyphs` sources. They load into the application process at startup, so using the prototype requires neither Windows font installation nor selecting an external font. The current list and “Choose font files” button are transitional UI and will be replaced by the game-and-script catalog.
+The current development branch includes 29 static TTFs reproducibly built from 11 `.glyphs` sources. They load into the application process at startup, so using the prototype requires neither Windows font installation nor selecting an external font. Font Library only shows inventory and load diagnostics. Glyph Browser selects its own font and presents ordinary input characters instead of technical Unicode identifiers. The current lists will later be replaced by the game-and-script catalog.
 
 ## Upstream resources and pinned versions
 

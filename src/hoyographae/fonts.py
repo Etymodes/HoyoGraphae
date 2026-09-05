@@ -106,11 +106,6 @@ def inspect_font(path: str | Path) -> FontMetadata:
     return FontMetadata(font_path, display_name, tuple(sorted(codepoints)))
 
 
-def format_codepoint(codepoint: int) -> str:
-    width = 4 if codepoint <= 0xFFFF else 6
-    return f"U+{codepoint:0{width}X}"
-
-
 def display_character(codepoint: int) -> str:
     character = chr(codepoint)
     return character if character.isprintable() and not character.isspace() else "·"

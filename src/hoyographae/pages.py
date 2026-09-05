@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import unicodedata
 from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QFont, QImageReader, QPixmap
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QCheckBox,
     QColorDialog,
     QComboBox,
@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from . import __version__
-from .fonts import SUPPORTED_EXTENSIONS, display_character, format_codepoint
+from .fonts import display_character
 from .i18n import LanguageManager
 from .rendering import render_text_image
 
@@ -129,12 +129,9 @@ class FontLibraryPage(QWidget):
         self.language = language
         self.title, self.subtitle = _page_title("", "")
         self.font_list = QListWidget()
-        self.font_list.setAlternatingRowColors(True)
-        self.font_list.currentRowChanged.connect(self.store.select)
-
-        self.add_button = QPushButton()
-        self.add_button.setObjectName("primaryButton")
-        self.add_button.clicked.connect(self._choose_fonts)
+        self.font_list.setObjectName("fontInventory")
+        self.font_list.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.font_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.summary = QLabel()
         self.summary.setObjectName("mutedLabel")
@@ -146,62 +143,31 @@ class FontLibraryPage(QWidget):
         layout.addWidget(self.title)
         layout.addWidget(self.subtitle)
         layout.addSpacing(8)
-        layout.addWidget(self.add_button, 0, Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.font_list, 1)
         layout.addWidget(self.summary)
 
         self.store.fonts_changed.connect(self._refresh)
-        self.store.current_changed.connect(self._show_current)
         self.language.changed.connect(self.retranslate)
         self._refresh()
         self.retranslate()
 
-    def _choose_fonts(self) -> None:
-        extensions = " ".join(f"*{suffix}" for suffix in sorted(SUPPORTED_EXTENSIONS))
-        paths, _ = QFileDialog.getOpenFileNames(
-            self,
-            self.language.text("font.dialog_title"),
-            "",
-            f"Fonts ({extensions});;All files (*)",
-        )
-        failures: list[str] = []
-        for path in paths:
-            try:
-                self.store.add(path)
-            except ValueError as exc:
-                failures.append(f"{Path(path).name}: {exc}")
-        if failures:
-            QMessageBox.warning(
-                self,
-                self.language.text("font.warning_title"),
-                "\n".join(failures),
-            )
-
     def _refresh(self) -> None:
-        selected_path = self.store.current.metadata.path if self.store.current else None
-        self.font_list.blockSignals(True)
         self.font_list.clear()
-        selected_row = -1
-        for row, loaded in enumerate(self.store.fonts):
+        for loaded in self.store.fonts:
             item = QListWidgetItem(loaded.metadata.display_name)
             item.setToolTip(str(loaded.metadata.path))
             self.font_list.addItem(item)
-            if loaded.metadata.path == selected_path:
-                selected_row = row
-        self.font_list.setCurrentRow(selected_row)
-        self.font_list.blockSignals(False)
+        self._update_summary()
 
-    def _show_current(self, loaded) -> None:
+    def _update_summary(self) -> None:
         lines: list[str] = []
-        if loaded is None:
+        if not self.store.fonts:
             lines.append(self.language.text("font.empty"))
         else:
             lines.append(
                 self.language.text(
-                    "font.current",
-                    name=loaded.metadata.display_name,
-                    count=len(loaded.metadata.codepoints),
-                    path=loaded.metadata.path,
+                    "font.inventory",
+                    count=len(self.store.fonts),
                 )
             )
         if self.store.load_errors:
@@ -219,8 +185,7 @@ class FontLibraryPage(QWidget):
     def retranslate(self, _language: str | None = None) -> None:
         self.title.setText(self.language.text("font.title"))
         self.subtitle.setText(self.language.text("font.subtitle"))
-        self.add_button.setText(self.language.text("font.add"))
-        self._show_current(self.store.current)
+        self._update_summary()
 
 
 class GlyphBrowserPage(QWidget):
@@ -231,10 +196,18 @@ class GlyphBrowserPage(QWidget):
         super().__init__()
         self.store = store
         self.language = language
+        self._loaded = None
         self._matches: tuple[int, ...] = ()
         self._page = 0
 
         self.title, self.subtitle = _page_title("", "")
+        self.font_label = QLabel()
+        self.font_combo = QComboBox()
+        self.font_combo.currentIndexChanged.connect(self._select_font)
+        font_row = QHBoxLayout()
+        font_row.addWidget(self.font_label)
+        font_row.addWidget(self.font_combo, 1)
+
         self.search = QTextEdit()
         self.search.setAcceptRichText(False)
         self.search.setFixedHeight(52)
@@ -266,23 +239,44 @@ class GlyphBrowserPage(QWidget):
         layout.setSpacing(14)
         layout.addWidget(self.title)
         layout.addWidget(self.subtitle)
+        layout.addLayout(font_row)
         layout.addWidget(self.search)
         layout.addWidget(self.table, 1)
         layout.addLayout(pager)
 
-        self.store.current_changed.connect(self._font_changed)
+        self.store.fonts_changed.connect(self._refresh_fonts)
         self.language.changed.connect(self.retranslate)
+        self._refresh_fonts()
         self.retranslate()
-        self._font_changed(self.store.current)
 
-    def _font_changed(self, loaded) -> None:
+    def _refresh_fonts(self) -> None:
+        selected_path = self._loaded.metadata.path if self._loaded else None
+        self.font_combo.blockSignals(True)
+        self.font_combo.clear()
+        selected_index = 0 if self.store.fonts else -1
+        for index, loaded in enumerate(self.store.fonts):
+            self.font_combo.addItem(loaded.metadata.display_name)
+            if loaded.metadata.path == selected_path:
+                selected_index = index
+        self.font_combo.setCurrentIndex(selected_index)
+        self.font_combo.blockSignals(False)
+        self._select_font(selected_index)
+
+    def _select_font(self, index: int) -> None:
+        self._loaded = (
+            self.store.fonts[index]
+            if 0 <= index < len(self.store.fonts)
+            else None
+        )
+        self.search.blockSignals(True)
         self.search.clear()
-        self._matches = loaded.metadata.codepoints if loaded else ()
+        self.search.blockSignals(False)
+        self._matches = self._loaded.metadata.codepoints if self._loaded else ()
         self._page = 0
         self._render_page()
 
     def _filter(self) -> None:
-        loaded = self.store.current
+        loaded = self._loaded
         if loaded is None:
             self._matches = ()
         else:
@@ -290,23 +284,11 @@ class GlyphBrowserPage(QWidget):
             source = loaded.metadata.codepoints
             if not query:
                 self._matches = source
-            elif query.upper().startswith("U+"):
-                try:
-                    target = int(query[2:], 16)
-                except ValueError:
-                    self._matches = ()
-                else:
-                    self._matches = (target,) if target in source else ()
             elif len(query) == 1:
                 target = ord(query)
                 self._matches = (target,) if target in source else ()
             else:
-                needle = query.upper()
-                self._matches = tuple(
-                    codepoint
-                    for codepoint in source
-                    if needle in unicodedata.name(chr(codepoint), "")
-                )
+                self._matches = ()
         self._page = 0
         self._render_page()
 
@@ -327,7 +309,7 @@ class GlyphBrowserPage(QWidget):
         for column in range(self.COLUMN_COUNT):
             self.table.setColumnWidth(column, 104)
 
-        loaded = self.store.current
+        loaded = self._loaded
         display_font = loaded.qfont(25) if loaded else QFont()
         for offset, codepoint in enumerate(visible):
             row, column = divmod(offset, self.COLUMN_COUNT)
@@ -339,13 +321,12 @@ class GlyphBrowserPage(QWidget):
             glyph_label = QLabel(display_character(codepoint))
             glyph_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             glyph_label.setFont(display_font)
-            codepoint_label = QLabel(format_codepoint(codepoint))
-            codepoint_label.setObjectName("codepointLabel")
-            codepoint_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            source_label = QLabel(display_character(codepoint))
+            source_label.setObjectName("sourceCharacterLabel")
+            source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             cell_layout.addWidget(glyph_label, 1)
-            cell_layout.addWidget(codepoint_label)
-            cell.setToolTip(unicodedata.name(chr(codepoint), "Unnamed character"))
+            cell_layout.addWidget(source_label)
             self.table.setCellWidget(row, column, cell)
             self.table.setRowHeight(row, 82)
 
@@ -366,6 +347,7 @@ class GlyphBrowserPage(QWidget):
     def retranslate(self, _language: str | None = None) -> None:
         self.title.setText(self.language.text("glyph.title"))
         self.subtitle.setText(self.language.text("glyph.subtitle"))
+        self.font_label.setText(self.language.text("glyph.font"))
         self.search.setPlaceholderText(self.language.text("glyph.search"))
         self.previous_button.setText(self.language.text("glyph.previous"))
         self.next_button.setText(self.language.text("glyph.next"))

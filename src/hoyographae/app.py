@@ -245,6 +245,8 @@ QListWidget, QTableWidget, QTextEdit, QScrollArea, QSpinBox, QComboBox {
     selection-background-color: #236486;
 }
 QListWidget::item { padding: 10px; }
+QListWidget#fontInventory { background: #081B2C; alternate-background-color: #081B2C; }
+QListWidget#fontInventory::item { background: #081B2C; color: #DDF4FF; }
 QHeaderView::section { background: #102F45; border: 0; }
 QScrollBar:vertical { background: #0A2031; width: 12px; }
 QScrollBar::handle:vertical { background: #285B72; min-height: 28px; border-radius: 5px; }
@@ -252,7 +254,7 @@ QScrollBar::handle:vertical { background: #285B72; min-height: 28px; border-radi
 #imageDropZone { background: #0D2639; border: 1px dashed #3B7894; border-radius: 8px; color: #6FA1B8; }
 #noticeCard { background: #102F45; border: 1px solid #2A6682; border-radius: 8px; }
 #noticeTitle { color: #7DE1FF; font-size: 17px; font-weight: 700; }
-#codepointLabel { color: #87BBD2; font-size: 11px; }
+#sourceCharacterLabel { color: #87BBD2; font-size: 11px; }
 QToolTip { background: #DDF4FF; color: #071824; border: 0; }
 """
 

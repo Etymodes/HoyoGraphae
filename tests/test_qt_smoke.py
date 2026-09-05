@@ -9,11 +9,11 @@ pytest.importorskip("PySide6")
 
 from PySide6.QtCore import QSettings
 from PySide6.QtGui import QColor, QFont
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QAbstractItemView, QApplication, QLabel
 
 import hoyographae.app as app_module
 from hoyographae.app import FontStore, MainWindow
-from hoyographae.fonts import bundled_font_faces
+from hoyographae.fonts import bundled_font_faces, display_character
 from hoyographae.i18n import LanguageManager
 from hoyographae.rendering import render_text_image
 
@@ -41,7 +41,19 @@ def test_main_window_starts_on_home_with_bundled_fonts(application, tmp_path) ->
         ]
         assert window.store.load_errors == {}
         assert window.font_library_page.font_list.count() == 29
-        assert window.glyph_browser_page._matches == window.store.current.metadata.codepoints
+        assert not hasattr(window.font_library_page, "add_button")
+        assert not window.font_library_page.font_list.alternatingRowColors()
+        assert (
+            window.font_library_page.font_list.selectionMode()
+            == QAbstractItemView.SelectionMode.NoSelection
+        )
+        assert window.glyph_browser_page.font_combo.count() == 29
+        assert window.glyph_browser_page._loaded is window.store.fonts[0]
+        assert (
+            window.glyph_browser_page._matches
+            == window.store.fonts[0].metadata.codepoints
+        )
+        assert "Unicode" not in window.font_library_page.summary.text()
         assert window.text_preview_page._font().styleName() == window.store.current.style
     finally:
         window.close()
@@ -63,6 +75,38 @@ def test_one_bundled_font_failure_does_not_block_the_rest(
     assert [font.face_id for font in store.fonts] == [faces[1].face_id]
     assert store.current is store.fonts[0]
     assert list(store.load_errors) == [broken.face_id]
+
+
+def test_font_inventory_and_glyph_browser_are_decoupled(
+    application, tmp_path
+) -> None:
+    settings = QSettings(str(tmp_path / "settings.ini"), QSettings.Format.IniFormat)
+    window = MainWindow(settings)
+    try:
+        glyph_browser = window.glyph_browser_page
+        initial_glyph_font = glyph_browser._loaded
+
+        window.font_library_page.font_list.setCurrentRow(1)
+        assert window.store.current is window.store.fonts[0]
+        assert glyph_browser._loaded is initial_glyph_font
+
+        window.store.select(1)
+        assert window.store.current is window.store.fonts[1]
+        assert glyph_browser._loaded is initial_glyph_font
+
+        glyph_browser.font_combo.setCurrentIndex(2)
+        assert glyph_browser._loaded is window.store.fonts[2]
+        assert window.store.current is window.store.fonts[1]
+
+        first_codepoint = glyph_browser._matches[0]
+        first_cell = glyph_browser.table.cellWidget(0, 0)
+        source_label = first_cell.findChild(QLabel, "sourceCharacterLabel")
+        assert source_label.text() == display_character(first_codepoint)
+        assert first_cell.findChild(QLabel, "codepointLabel") is None
+        assert "U+" not in glyph_browser.search.placeholderText()
+        assert "Unicode" not in glyph_browser.subtitle.text()
+    finally:
+        window.close()
 
 
 def test_language_combo_updates_every_page_and_persists(application, tmp_path) -> None:

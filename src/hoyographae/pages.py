@@ -1,4 +1,4 @@
-"""The four Qt Widgets pages used by the desktop MVP."""
+"""Qt Widgets pages used by the desktop application."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from PySide6.QtGui import QColor, QFont, QImageReader, QPixmap
 from PySide6.QtWidgets import (
     QCheckBox,
     QColorDialog,
+    QComboBox,
     QFileDialog,
     QFrame,
     QGridLayout,
@@ -27,7 +28,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from . import __version__
 from .fonts import SUPPORTED_EXTENSIONS, display_character, format_codepoint
+from .i18n import LanguageManager
 from .rendering import render_text_image
 
 
@@ -40,43 +43,122 @@ def _page_title(title: str, subtitle: str) -> tuple[QLabel, QLabel]:
     return heading, detail
 
 
+class HomePage(QWidget):
+    def __init__(self, language: LanguageManager) -> None:
+        super().__init__()
+        self.language = language
+        self.title, self.subtitle = _page_title("", "")
+
+        self.intro = QLabel()
+        self.intro.setWordWrap(True)
+
+        feature_card = QFrame()
+        feature_card.setObjectName("noticeCard")
+        feature_layout = QVBoxLayout(feature_card)
+        self.features_title = QLabel()
+        self.features_title.setObjectName("noticeTitle")
+        self.features = QLabel()
+        self.features.setWordWrap(True)
+        feature_layout.addWidget(self.features_title)
+        feature_layout.addWidget(self.features)
+
+        settings_card = QFrame()
+        settings_card.setObjectName("noticeCard")
+        settings_layout = QVBoxLayout(settings_card)
+        self.settings_title = QLabel()
+        self.settings_title.setObjectName("noticeTitle")
+        self.language_label = QLabel()
+        self.language_combo = QComboBox()
+        self.language_combo.addItem("简体中文", "zh_CN")
+        self.language_combo.addItem("English", "en_US")
+        language_row = QHBoxLayout()
+        language_row.addWidget(self.language_label)
+        language_row.addWidget(self.language_combo)
+        language_row.addStretch()
+        settings_layout.addWidget(self.settings_title)
+        settings_layout.addLayout(language_row)
+
+        self.version = QLabel()
+        self.version.setObjectName("mutedLabel")
+        self.notice = QLabel()
+        self.notice.setObjectName("mutedLabel")
+        self.notice.setWordWrap(True)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(14)
+        layout.addWidget(self.title)
+        layout.addWidget(self.subtitle)
+        layout.addWidget(self.intro)
+        layout.addWidget(feature_card)
+        layout.addWidget(settings_card)
+        layout.addStretch()
+        layout.addWidget(self.version)
+        layout.addWidget(self.notice)
+
+        self.language_combo.currentIndexChanged.connect(self._select_language)
+        self.language.changed.connect(self.retranslate)
+        self.retranslate()
+
+    def _select_language(self, index: int) -> None:
+        language = self.language_combo.itemData(index)
+        if language:
+            self.language.set_language(language)
+
+    def retranslate(self, _language: str | None = None) -> None:
+        self.title.setText(self.language.text("home.title"))
+        self.subtitle.setText(self.language.text("home.subtitle"))
+        self.intro.setText(self.language.text("home.intro"))
+        self.features_title.setText(self.language.text("home.features_title"))
+        self.features.setText(self.language.text("home.features"))
+        self.settings_title.setText(self.language.text("home.settings_title"))
+        self.language_label.setText(self.language.text("home.language_label"))
+        self.version.setText(self.language.text("home.version", version=__version__))
+        self.notice.setText(self.language.text("home.notice"))
+
+        index = self.language_combo.findData(self.language.language)
+        self.language_combo.blockSignals(True)
+        self.language_combo.setCurrentIndex(index)
+        self.language_combo.blockSignals(False)
+
+
 class FontLibraryPage(QWidget):
-    def __init__(self, store) -> None:
+    def __init__(self, store, language: LanguageManager) -> None:
         super().__init__()
         self.store = store
-        title, subtitle = _page_title(
-            "字体库 · Font Library",
-            "载入本机字体文件。文件只在当前会话中读取，不会被复制或修改。",
-        )
+        self.language = language
+        self.title, self.subtitle = _page_title("", "")
         self.font_list = QListWidget()
         self.font_list.setAlternatingRowColors(True)
         self.font_list.currentRowChanged.connect(self.store.select)
 
-        add_button = QPushButton("＋ 选择字体文件")
-        add_button.setObjectName("primaryButton")
-        add_button.clicked.connect(self._choose_fonts)
+        self.add_button = QPushButton()
+        self.add_button.setObjectName("primaryButton")
+        self.add_button.clicked.connect(self._choose_fonts)
 
-        self.summary = QLabel("尚未载入字体")
+        self.summary = QLabel()
         self.summary.setObjectName("mutedLabel")
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 28, 32, 28)
         layout.setSpacing(14)
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
+        layout.addWidget(self.title)
+        layout.addWidget(self.subtitle)
         layout.addSpacing(8)
-        layout.addWidget(add_button, 0, Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.add_button, 0, Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.font_list, 1)
         layout.addWidget(self.summary)
 
         self.store.fonts_changed.connect(self._refresh)
         self.store.current_changed.connect(self._show_current)
+        self.language.changed.connect(self.retranslate)
+        self.retranslate()
 
     def _choose_fonts(self) -> None:
         extensions = " ".join(f"*{suffix}" for suffix in sorted(SUPPORTED_EXTENSIONS))
         paths, _ = QFileDialog.getOpenFileNames(
             self,
-            "选择字体文件",
+            self.language.text("font.dialog_title"),
             "",
             f"Fonts ({extensions});;All files (*)",
         )
@@ -87,7 +169,11 @@ class FontLibraryPage(QWidget):
             except ValueError as exc:
                 failures.append(f"{Path(path).name}: {exc}")
         if failures:
-            QMessageBox.warning(self, "部分字体未载入", "\n".join(failures))
+            QMessageBox.warning(
+                self,
+                self.language.text("font.warning_title"),
+                "\n".join(failures),
+            )
 
     def _refresh(self) -> None:
         selected_path = self.store.current.metadata.path if self.store.current else None
@@ -105,31 +191,38 @@ class FontLibraryPage(QWidget):
 
     def _show_current(self, loaded) -> None:
         if loaded is None:
-            self.summary.setText("尚未载入字体")
+            self.summary.setText(self.language.text("font.empty"))
             return
         self.summary.setText(
-            f"当前：{loaded.metadata.display_name}  ·  "
-            f"{len(loaded.metadata.codepoints):,} 个 Unicode 映射\n{loaded.metadata.path}"
+            self.language.text(
+                "font.current",
+                name=loaded.metadata.display_name,
+                count=len(loaded.metadata.codepoints),
+                path=loaded.metadata.path,
+            )
         )
+
+    def retranslate(self, _language: str | None = None) -> None:
+        self.title.setText(self.language.text("font.title"))
+        self.subtitle.setText(self.language.text("font.subtitle"))
+        self.add_button.setText(self.language.text("font.add"))
+        self._show_current(self.store.current)
 
 
 class GlyphBrowserPage(QWidget):
     PAGE_SIZE = 256
     COLUMN_COUNT = 8
 
-    def __init__(self, store) -> None:
+    def __init__(self, store, language: LanguageManager) -> None:
         super().__init__()
         self.store = store
+        self.language = language
         self._matches: tuple[int, ...] = ()
         self._page = 0
 
-        title, subtitle = _page_title(
-            "字形查阅 · Glyph Browser",
-            "通过 fontTools 读取 cmap。可输入字符、U+编号或 Unicode 名称筛选。",
-        )
+        self.title, self.subtitle = _page_title("", "")
         self.search = QTextEdit()
         self.search.setAcceptRichText(False)
-        self.search.setPlaceholderText("筛选，例如：星、U+0041、LATIN CAPITAL")
         self.search.setFixedHeight(52)
         self.search.textChanged.connect(self._filter)
 
@@ -140,11 +233,11 @@ class GlyphBrowserPage(QWidget):
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.setShowGrid(False)
 
-        self.previous_button = QPushButton("← 上一页")
-        self.next_button = QPushButton("下一页 →")
+        self.previous_button = QPushButton()
+        self.next_button = QPushButton()
         self.previous_button.clicked.connect(lambda: self._move_page(-1))
         self.next_button.clicked.connect(lambda: self._move_page(1))
-        self.page_label = QLabel("请选择字体")
+        self.page_label = QLabel()
         self.page_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         pager = QHBoxLayout()
@@ -157,14 +250,15 @@ class GlyphBrowserPage(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 28, 32, 28)
         layout.setSpacing(14)
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
+        layout.addWidget(self.title)
+        layout.addWidget(self.subtitle)
         layout.addWidget(self.search)
         layout.addWidget(self.table, 1)
         layout.addLayout(pager)
 
         self.store.current_changed.connect(self._font_changed)
-        self._render_page()
+        self.language.changed.connect(self.retranslate)
+        self.retranslate()
 
     def _font_changed(self, loaded) -> None:
         self.search.clear()
@@ -242,24 +336,37 @@ class GlyphBrowserPage(QWidget):
             self.table.setRowHeight(row, 82)
 
         if loaded is None:
-            self.page_label.setText("请先在字体库中载入字体")
+            self.page_label.setText(self.language.text("glyph.load_font"))
         else:
-            self.page_label.setText(f"第 {self._page + 1} / {page_count} 页 · {total:,} 项")
+            self.page_label.setText(
+                self.language.text(
+                    "glyph.page",
+                    page=self._page + 1,
+                    pages=page_count,
+                    count=total,
+                )
+            )
         self.previous_button.setEnabled(self._page > 0)
         self.next_button.setEnabled(self._page + 1 < page_count)
 
+    def retranslate(self, _language: str | None = None) -> None:
+        self.title.setText(self.language.text("glyph.title"))
+        self.subtitle.setText(self.language.text("glyph.subtitle"))
+        self.search.setPlaceholderText(self.language.text("glyph.search"))
+        self.previous_button.setText(self.language.text("glyph.previous"))
+        self.next_button.setText(self.language.text("glyph.next"))
+        self._render_page()
+
 
 class TextPreviewPage(QWidget):
-    def __init__(self, store) -> None:
+    def __init__(self, store, language: LanguageManager) -> None:
         super().__init__()
         self.store = store
+        self.language = language
         self.foreground = QColor("#EAF8FF")
         self.background = QColor("#102B46")
 
-        title, subtitle = _page_title(
-            "实时打字 · Live Typesetter",
-            "键盘输入会使用当前字体实时排版，并可导出透明或纯色背景 PNG。",
-        )
+        self.title, self.subtitle = _page_title("", "")
         self.editor = QTextEdit("HoyoGraphae\n提瓦特字形实验室")
         self.editor.setAcceptRichText(False)
         self.editor.textChanged.connect(self._update_preview)
@@ -270,28 +377,29 @@ class TextPreviewPage(QWidget):
         self.size_input.setSuffix(" pt")
         self.size_input.valueChanged.connect(self._update_preview)
 
-        self.foreground_button = QPushButton("文字颜色")
-        self.background_button = QPushButton("背景颜色")
+        self.foreground_button = QPushButton()
+        self.background_button = QPushButton()
         self.foreground_button.clicked.connect(self._choose_foreground)
         self.background_button.clicked.connect(self._choose_background)
 
-        self.transparent = QCheckBox("透明背景")
+        self.transparent = QCheckBox()
         self.transparent.toggled.connect(self._transparency_changed)
 
-        export_button = QPushButton("导出 PNG")
-        export_button.setObjectName("primaryButton")
-        export_button.clicked.connect(self._export)
+        self.export_button = QPushButton()
+        self.export_button.setObjectName("primaryButton")
+        self.export_button.clicked.connect(self._export)
 
         controls = QHBoxLayout()
-        controls.addWidget(QLabel("字号"))
+        self.size_label = QLabel()
+        controls.addWidget(self.size_label)
         controls.addWidget(self.size_input)
         controls.addWidget(self.foreground_button)
         controls.addWidget(self.background_button)
         controls.addWidget(self.transparent)
         controls.addStretch()
-        controls.addWidget(export_button)
+        controls.addWidget(self.export_button)
 
-        self.font_status = QLabel("当前使用系统默认字体")
+        self.font_status = QLabel()
         self.font_status.setObjectName("mutedLabel")
         self.preview = QLabel()
         self.preview.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
@@ -309,15 +417,16 @@ class TextPreviewPage(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 28, 32, 28)
         layout.setSpacing(14)
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
+        layout.addWidget(self.title)
+        layout.addWidget(self.subtitle)
         layout.addLayout(controls)
         layout.addWidget(self.font_status)
         layout.addLayout(content, 1)
 
         self.store.current_changed.connect(self._font_changed)
+        self.language.changed.connect(self.retranslate)
         self._sync_color_buttons()
-        self._update_preview()
+        self.retranslate()
 
     def _font(self) -> QFont:
         font = QFont(self.store.current.family if self.store.current else "")
@@ -337,7 +446,9 @@ class TextPreviewPage(QWidget):
 
     def _font_changed(self, loaded) -> None:
         self.font_status.setText(
-            f"当前字体：{loaded.metadata.display_name}" if loaded else "当前使用系统默认字体"
+            self.language.text("typesetter.current_font", name=loaded.metadata.display_name)
+            if loaded
+            else self.language.text("typesetter.default_font")
         )
         self._update_preview()
 
@@ -347,14 +458,22 @@ class TextPreviewPage(QWidget):
         self.preview.setMinimumSize(image.size())
 
     def _choose_foreground(self) -> None:
-        color = QColorDialog.getColor(self.foreground, self, "选择文字颜色")
+        color = QColorDialog.getColor(
+            self.foreground,
+            self,
+            self.language.text("typesetter.foreground_dialog"),
+        )
         if color.isValid():
             self.foreground = color
             self._sync_color_buttons()
             self._update_preview()
 
     def _choose_background(self) -> None:
-        color = QColorDialog.getColor(self.background, self, "选择背景颜色")
+        color = QColorDialog.getColor(
+            self.background,
+            self,
+            self.language.text("typesetter.background_dialog"),
+        )
         if color.isValid():
             self.background = color
             self._sync_color_buttons()
@@ -370,34 +489,60 @@ class TextPreviewPage(QWidget):
 
     def _export(self) -> None:
         if not self.editor.toPlainText():
-            QMessageBox.information(self, "没有文本", "请先输入要导出的文本。")
+            QMessageBox.information(
+                self,
+                self.language.text("typesetter.no_text_title"),
+                self.language.text("typesetter.no_text"),
+            )
             return
-        path, _ = QFileDialog.getSaveFileName(self, "导出 PNG", "HoyoGraphae.png", "PNG image (*.png)")
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            self.language.text("typesetter.export_dialog"),
+            "HoyoGraphae.png",
+            "PNG image (*.png)",
+        )
         if not path:
             return
         if Path(path).suffix.lower() != ".png":
             path += ".png"
         if not self._render().save(path, "PNG"):
-            QMessageBox.critical(self, "导出失败", f"无法写入：{path}")
+            QMessageBox.critical(
+                self,
+                self.language.text("typesetter.export_error_title"),
+                self.language.text("typesetter.export_error", path=path),
+            )
             return
-        QMessageBox.information(self, "导出完成", f"PNG 已保存：\n{path}")
+        QMessageBox.information(
+            self,
+            self.language.text("typesetter.export_done_title"),
+            self.language.text("typesetter.export_done", path=path),
+        )
+
+    def retranslate(self, _language: str | None = None) -> None:
+        self.title.setText(self.language.text("typesetter.title"))
+        self.subtitle.setText(self.language.text("typesetter.subtitle"))
+        self.size_label.setText(self.language.text("typesetter.size"))
+        self.foreground_button.setText(self.language.text("typesetter.foreground"))
+        self.background_button.setText(self.language.text("typesetter.background"))
+        self.transparent.setText(self.language.text("typesetter.transparent"))
+        self.export_button.setText(self.language.text("typesetter.export"))
+        self._font_changed(self.store.current)
 
 
 class OcrPage(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, language: LanguageManager) -> None:
         super().__init__()
-        title, subtitle = _page_title(
-            "图片文字识别 · Image OCR",
-            "选择图片用于后续识别流程。当前 MVP 尚未包含 OCR 推理模型。",
-        )
-        choose_button = QPushButton("选择图片")
-        choose_button.setObjectName("primaryButton")
-        choose_button.clicked.connect(self._choose_image)
+        self.language = language
+        self.selected_path: str | None = None
+        self.title, self.subtitle = _page_title("", "")
+        self.choose_button = QPushButton()
+        self.choose_button.setObjectName("primaryButton")
+        self.choose_button.clicked.connect(self._choose_image)
 
-        self.path_label = QLabel("尚未选择图片")
+        self.path_label = QLabel()
         self.path_label.setObjectName("mutedLabel")
         self.path_label.setWordWrap(True)
-        self.image_preview = QLabel("图片预览")
+        self.image_preview = QLabel()
         self.image_preview.setObjectName("imageDropZone")
         self.image_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_preview.setMinimumSize(560, 340)
@@ -405,25 +550,25 @@ class OcrPage(QWidget):
         notice = QFrame()
         notice.setObjectName("noticeCard")
         notice_layout = QVBoxLayout(notice)
-        notice_title = QLabel("OCR 模型尚未接入")
-        notice_title.setObjectName("noticeTitle")
-        notice_text = QLabel(
-            "OCR model is not connected yet. 当前版本不会生成、猜测或伪造识别结果；"
-            "后续将从明确选定的本地模型接入。"
-        )
-        notice_text.setWordWrap(True)
-        notice_layout.addWidget(notice_title)
-        notice_layout.addWidget(notice_text)
+        self.notice_title = QLabel()
+        self.notice_title.setObjectName("noticeTitle")
+        self.notice_text = QLabel()
+        self.notice_text.setWordWrap(True)
+        notice_layout.addWidget(self.notice_title)
+        notice_layout.addWidget(self.notice_text)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 28, 32, 28)
         layout.setSpacing(14)
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
-        layout.addWidget(choose_button, 0, Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.title)
+        layout.addWidget(self.subtitle)
+        layout.addWidget(self.choose_button, 0, Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.path_label)
         layout.addWidget(self.image_preview, 1)
         layout.addWidget(notice)
+
+        self.language.changed.connect(self.retranslate)
+        self.retranslate()
 
     def _choose_image(self) -> None:
         patterns = " ".join(
@@ -431,7 +576,7 @@ class OcrPage(QWidget):
         )
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "选择待识别图片",
+            self.language.text("ocr.dialog_title"),
             "",
             f"Images ({patterns});;All files (*)",
         )
@@ -439,8 +584,9 @@ class OcrPage(QWidget):
             return
         pixmap = QPixmap(path)
         if pixmap.isNull():
-            QMessageBox.warning(self, "无法读取图片", path)
+            QMessageBox.warning(self, self.language.text("ocr.read_error"), path)
             return
+        self.selected_path = path
         self.path_label.setText(path)
         self.image_preview.setPixmap(
             pixmap.scaled(
@@ -450,3 +596,13 @@ class OcrPage(QWidget):
                 Qt.TransformationMode.SmoothTransformation,
             )
         )
+
+    def retranslate(self, _language: str | None = None) -> None:
+        self.title.setText(self.language.text("ocr.title"))
+        self.subtitle.setText(self.language.text("ocr.subtitle"))
+        self.choose_button.setText(self.language.text("ocr.choose"))
+        self.notice_title.setText(self.language.text("ocr.notice_title"))
+        self.notice_text.setText(self.language.text("ocr.notice"))
+        if self.selected_path is None:
+            self.path_label.setText(self.language.text("ocr.no_image"))
+            self.image_preview.setText(self.language.text("ocr.preview"))

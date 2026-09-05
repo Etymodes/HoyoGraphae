@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Qt, Signal
+from PySide6.QtCore import QObject, QSettings, Qt, Signal
 from PySide6.QtGui import QFontDatabase, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -20,8 +20,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from . import __version__
 from .fonts import FontInspectionError, FontMetadata, inspect_font
-from .pages import FontLibraryPage, GlyphBrowserPage, OcrPage, TextPreviewPage
+from .i18n import LanguageManager
+from .pages import FontLibraryPage, GlyphBrowserPage, HomePage, OcrPage, TextPreviewPage
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,8 +37,9 @@ class FontStore(QObject):
     fonts_changed = Signal()
     current_changed = Signal(object)
 
-    def __init__(self) -> None:
+    def __init__(self, language: LanguageManager) -> None:
         super().__init__()
+        self.language = language
         self.fonts: list[LoadedFont] = []
         self.current: LoadedFont | None = None
 
@@ -49,11 +52,11 @@ class FontStore(QObject):
 
         font_id = QFontDatabase.addApplicationFont(str(metadata.path))
         if font_id < 0:
-            raise FontInspectionError("Qt 无法载入该字体用于屏幕预览")
+            raise FontInspectionError(self.language.text("font.qt_load_error"))
         families = QFontDatabase.applicationFontFamilies(font_id)
         if not families:
             QFontDatabase.removeApplicationFont(font_id)
-            raise FontInspectionError("字体没有可用的 family 名称")
+            raise FontInspectionError(self.language.text("font.family_error"))
 
         loaded = LoadedFont(metadata, families[0], font_id)
         self.fonts.append(loaded)
@@ -72,7 +75,7 @@ class FontStore(QObject):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self) -> None:
+    def __init__(self, settings: QSettings | None = None) -> None:
         super().__init__()
         self.setWindowTitle("HoyoGraphae")
         self.resize(1280, 820)
@@ -84,12 +87,22 @@ class MainWindow(QMainWindow):
         if window_icon_path.is_file():
             self.setWindowIcon(QIcon(str(window_icon_path)))
 
-        self.store = FontStore()
+        self.language = LanguageManager(settings)
+        self.store = FontStore(self.language)
         self.pages = QStackedWidget()
-        self.pages.addWidget(FontLibraryPage(self.store))
-        self.pages.addWidget(GlyphBrowserPage(self.store))
-        self.pages.addWidget(TextPreviewPage(self.store))
-        self.pages.addWidget(OcrPage())
+        self.home_page = HomePage(self.language)
+        self.font_library_page = FontLibraryPage(self.store, self.language)
+        self.glyph_browser_page = GlyphBrowserPage(self.store, self.language)
+        self.text_preview_page = TextPreviewPage(self.store, self.language)
+        self.ocr_page = OcrPage(self.language)
+        for page in (
+            self.home_page,
+            self.font_library_page,
+            self.glyph_browser_page,
+            self.text_preview_page,
+            self.ocr_page,
+        ):
+            self.pages.addWidget(page)
 
         sidebar = QWidget()
         sidebar.setObjectName("sidebar")
@@ -111,27 +124,22 @@ class MainWindow(QMainWindow):
             sidebar_layout.addWidget(icon_label)
         brand = QLabel("HoyoGraphae")
         brand.setObjectName("brand")
-        tagline = QLabel("字形与文字实验室\nGlyph & Script Studio")
-        tagline.setObjectName("tagline")
+        self.tagline = QLabel()
+        self.tagline.setObjectName("tagline")
         sidebar_layout.addWidget(brand)
-        sidebar_layout.addWidget(tagline)
+        sidebar_layout.addWidget(self.tagline)
         sidebar_layout.addSpacing(14)
 
         self.navigation = QListWidget()
         self.navigation.setObjectName("navigation")
         self.navigation.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        for label in (
-            "字体库  Font Library",
-            "字形查阅  Glyphs",
-            "实时打字  Typesetter",
-            "图片识别  OCR",
-        ):
-            self.navigation.addItem(QListWidgetItem(label))
+        for _ in range(self.pages.count()):
+            self.navigation.addItem(QListWidgetItem())
         self.navigation.currentRowChanged.connect(self.pages.setCurrentIndex)
         self.navigation.setCurrentRow(0)
         sidebar_layout.addWidget(self.navigation, 1)
 
-        footer = QLabel("LOCAL MVP  ·  0.1.0")
+        footer = QLabel(f"LOCAL MVP  ·  {__version__}")
         footer.setObjectName("sidebarFooter")
         sidebar_layout.addWidget(footer)
 
@@ -142,6 +150,21 @@ class MainWindow(QMainWindow):
         root_layout.addWidget(sidebar)
         root_layout.addWidget(self.pages, 1)
         self.setCentralWidget(root)
+
+        self.language.changed.connect(self.retranslate)
+        self.retranslate()
+
+    def retranslate(self, _language: str | None = None) -> None:
+        self.tagline.setText(self.language.text("app.tagline"))
+        navigation_keys = (
+            "nav.home",
+            "nav.font_library",
+            "nav.glyphs",
+            "nav.typesetter",
+            "nav.ocr",
+        )
+        for index, key in enumerate(navigation_keys):
+            self.navigation.item(index).setText(self.language.text(key))
 
 
 STYLE_SHEET = """
@@ -168,7 +191,7 @@ QPushButton {
 QPushButton:hover { background: #194B67; border-color: #69D3F8; }
 QPushButton:disabled { color: #537488; background: #102636; border-color: #183C51; }
 #primaryButton { background: #16749B; border-color: #62D7FF; color: white; font-weight: 600; }
-QListWidget, QTableWidget, QTextEdit, QScrollArea, QSpinBox {
+QListWidget, QTableWidget, QTextEdit, QScrollArea, QSpinBox, QComboBox {
     background: #0D2639;
     border: 1px solid #24536B;
     border-radius: 7px;
